@@ -4,8 +4,8 @@ version: 0.0.3
 homepage: https://github.com/shAdow-XJY/list_twolevel
 
 environment:
-  sdk: ">=2.16.2 <3.0.0"
-  flutter: ">=1.17.0"
+  sdk: ">=3.9.2 <4.0.0"
+  flutter: ">=3.35.0"
 
 dependencies:
   flutter:

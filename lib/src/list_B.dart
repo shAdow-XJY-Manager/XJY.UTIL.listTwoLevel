@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
 class BListBuilder extends StatefulWidget {
-  List<Map<String, String>> levelObj;
-  Function(String selectedTitle)? onPressed;
-  double? itemHeight;
-  Color? backgroundColor;
-  TextStyle? textStyle;
-  EdgeInsetsGeometry? listPadding;
-  EdgeInsetsGeometry? itemMargin;
-  TextAlign? itemAlignment;
+  final List<Map<String, String>> levelObj;
+  final Function(String selectedTitle)? onPressed;
+  final double? itemHeight;
+  final Color? backgroundColor;
+  final TextStyle? textStyle;
+  final EdgeInsetsGeometry? listPadding;
+  final EdgeInsetsGeometry? itemMargin;
+  final TextAlign? itemAlignment;
   BListBuilder({
-    Key? key,
+    super.key,
     required this.levelObj,
     this.onPressed,
     this.itemHeight = 100,
@@ -19,58 +19,60 @@ class BListBuilder extends StatefulWidget {
     this.listPadding,
     this.itemMargin,
     this.itemAlignment,
-  }) : super(key: key);
-
+  });
   @override
-  _BListBuilderState createState() => _BListBuilderState();
+  State<BListBuilder> createState() => _BListBuilderState();
 }
 
 class _BListBuilderState extends State<BListBuilder> {
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    if (widget.levelObj.isEmpty) return const Center(child: Text('暂无内容'));
     return ListView.builder(
-      padding: widget.listPadding??const EdgeInsets.symmetric(horizontal: 10.0),
+      padding: widget.listPadding ?? const EdgeInsets.all(12),
       itemCount: widget.levelObj.length,
-      itemBuilder: (context, index) => Container(
-          height: widget.itemHeight,
-          width: double.infinity,
-          margin: widget.itemMargin??const EdgeInsets.only(bottom: 10, right: 10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: widget.backgroundColor ?? const Color(0xFF2E2E48),
-            boxShadow: const [BoxShadow()],
+      itemBuilder: (context, index) {
+        final entry = widget.levelObj[index];
+        final title = entry['title'] ?? '';
+
+        return Container(
+          margin: widget.itemMargin ?? const EdgeInsets.only(bottom: 12),
+          constraints: BoxConstraints(
+            minHeight: (widget.itemHeight ?? 48).clamp(48, double.infinity),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(width: 40,),
-              Expanded(
-                child: InkWell(
-                  child: Text(
-                    widget.levelObj[index]['title'] ?? '',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: widget.itemAlignment??TextAlign.center,
-                    style: widget.textStyle ??
-                        TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
-                            shadows: [
-                              BoxShadow(
-                                  blurRadius: 5,
-                                  color: Colors.white.withOpacity(0.54)),
-                            ]),
-                  ),
-                  onTap: () {
-                    widget.onPressed!(widget.levelObj[index]['title'] ?? '');
-                  },
+          child: Material(
+            color: widget.backgroundColor ?? scheme.surface,
+            borderRadius: BorderRadius.circular(8),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: widget.onPressed == null
+                  ? null
+                  : () => widget.onPressed?.call(title),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        textAlign: widget.itemAlignment ?? TextAlign.center,
+                        style:
+                            widget.textStyle ??
+                            Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ),
+                    if (widget.onPressed != null) ...[
+                      const SizedBox(width: 12),
+                      const Icon(Icons.chevron_right),
+                    ],
+                  ],
                 ),
               ),
-              const SizedBox(width: 40,),
-            ],
-          )
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
